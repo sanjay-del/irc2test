@@ -20,12 +20,13 @@ class TestBasicIRC2(IconIntegrateTestBase):
     SCORE_PROJECT = os.path.abspath(os.path.join(DIR_PATH, '..'))
 
     def setUp(self):
-        super.setUp()
+        super().setUp()
 
         self.icon_service = None
         self.name = 'Neps'
         self.symbol='nps'
-        self.initial_supply = 1
+        self.initial_supply = 10
+        self.decimals = 10
 
         params =  {
             "_name": self.name,
@@ -33,10 +34,9 @@ class TestBasicIRC2(IconIntegrateTestBase):
             "_initialSupply": self.initial_supply,
             "_decimals": self.decimals
         }
-        tx_result = self._deploy_score(score_path=self.SCORE_PROJECT, params=params)
-        self._score_address = tx_result['scoreAddress']
+        self._score_address = self._deploy_score(params=params)['scoreAddress']
 
-    def _deploy_score(self,to: str = SCORE_INSTALL_ADDRESS, params: dict None) -> dict :
+    def _deploy_score(self,to: str = SCORE_INSTALL_ADDRESS, params: dict = None) -> dict :
         transaction = DeployTransactionBuilder()\
                         .from_(self._test1.get_address()) \
                         .to(to) \
@@ -48,5 +48,14 @@ class TestBasicIRC2(IconIntegrateTestBase):
                         .params(params) \
                         .build()
         signed_transaction = SignedTransaction(transaction, self._test1)
-
         tx_result = self.process_transaction(signed_transaction, self.icon_service)
+        self.assertTrue('status' in tx_result)
+        self.assertEqual(1, tx_result['status'])
+        self.assertTrue('scoreAddress' in tx_result)
+        return tx_result
+
+    def test_score_update(self):
+        # update SCORE
+        tx_result = self._deploy_score(to=self._score_address)
+
+        self.assertEqual(self._score_address, tx_result['scoreAddress'])
