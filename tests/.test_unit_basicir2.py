@@ -6,8 +6,18 @@ from ..basic_irc2 import BasicIRC2
 class TestSimple(ScoreTestCase):
         def setUp(self):
                 super().setUp()
+                self.name = 'Neps'
+                self.symbol='nps'
+                self.initial_supply = 10
+                self.decimals = 10
+                params =  {
+                "_name": self.name,
+                "_symbol": self.symbol,
+                "_initialSupply": self.initial_supply,
+                "_decimals": self.decimals
+                }
                 self.score2 = self.get_score_instance(BasicIRC2, self.test_account1,
-                                                        on_install_params={'_name':'Soi','_symbol':'Si','_initialSupply':10,'_decimals':12})
+                                                        on_install_params=params)
                 self.test_account1 = Address.from_string(f"hx{'12345'*8}")
                 self.test_account2 = Address.from_string(f"hx{'12534'*8}")
                 # account_info = {

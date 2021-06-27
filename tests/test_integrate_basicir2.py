@@ -94,7 +94,8 @@ class TestBasicIRC2(IconIntegrateTestBase):
         result = self.process_transaction(signed_transaction, self.icon_service)
         self.assertTrue('status' in result)
         self.assertEqual(1, result['status'])
-
+        
+        print(f"StepCost for transafer {result['stepUsed']}")
         params = {
             "_owner" : to 
         }
@@ -104,6 +105,6 @@ class TestBasicIRC2(IconIntegrateTestBase):
                         .method('balanceOf') \
                         .params(params) \
                         .build()
-        
+        print(call)
         response = self.process_call(call, self.icon_service)
         self.assertEqual(hex(value), response)
