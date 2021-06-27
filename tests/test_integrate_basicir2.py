@@ -59,3 +59,50 @@ class TestBasicIRC2(IconIntegrateTestBase):
         tx_result = self._deploy_score(to=self._score_address)
 
         self.assertEqual(self._score_address, tx_result['scoreAddress'])
+
+    def test_balanceOf(self):
+        params = {
+            "_owner" : self._test1.get_address()
+        }
+        transaction = CallBuilder() \
+                        .from_(self._test1.get_address())\
+                        .to(self._score_address) \
+                        .method('balanceOf') \
+                        .params(params) \
+                        .build()
+        
+        response = self.process_call(transaction, self.icon_service)
+        self.assertEqual(hex(self.initial_supply*10**self.decimals), response)
+
+    def test_for_transfer(self):
+        to = self._wallet_array[0].get_address
+        params = {
+            '_to' : to,
+            '_value': 100 
+        }
+        transaction = CallTransactionBuilder()\
+                    .from(self._test1.get_address())\
+                    .to(to)\
+                    .step_limit(10_000_000)\
+                    .nid(3)\
+                    .nonce(100)\
+                    .method('transfer')\
+                    .params(params)\
+                    .build()
+        signed_transaction = SignedTransaction(transaction,self._test1)
+        result = self.process_transaction(signed_transaction, icon_service)
+        self.assertTrue('status' in result)
+        self.assertEqual(1, result['status'])
+
+        params = {
+            "_owner" : to 
+        }
+        transaction = CallBuilder() \
+                        .from_(self._test1.get_address())\
+                        .to(self._score_address) \
+                        .method('balanceOf') \
+                        .params(params) \
+                        .build()
+        
+        response = self.process_call(transaction, self.icon_service)
+        self.assertEqual(hex(value), response)
