@@ -50,12 +50,20 @@ class TestSimple(ScoreTestCase):
                 # print(balance_3)
                 self.assertEqual(self.symbol, self.score.symbol())
 
-        # def test_transfer(self):
-        #         to = self.test_account3
-        #         value = 100
-        #         params = {
-        #         '_to': to, 
-        #         '_value': value
-        #         }
-        #         self.score.transfer('_to': to, 
-        #         '_value': value)
+        def test_transfer(self):
+                owner = self.test_account1
+                to = self.test_account3
+                value = 100
+                #check balance
+                inibalance_owner = self.score.balanceOf(owner)
+                inibalance_receiver = self.score.balanceOf(to)
+                # print(rsi)
+                # print(resu)
+                self.set_msg(owner,value)
+                self.score.transfer(to, value)
+                #check the result
+                fibalance_owner = self.score.balanceOf(owner)
+                fibalance_receiver = self.score.balanceOf(to)
+                self.assertEqual(fibalance_owner, inibalance_owner-value)
+                self.assertEqual(fibalance_receiver, value)
+                
