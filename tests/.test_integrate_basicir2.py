@@ -105,6 +105,6 @@ class TestBasicIRC2(IconIntegrateTestBase):
                         .method('balanceOf') \
                         .params(params) \
                         .build()
-        print(call)
+    
         response = self.process_call(call, self.icon_service)
         self.assertEqual(hex(value), response)
