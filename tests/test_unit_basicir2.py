@@ -1,5 +1,5 @@
 from iconservice import Address
-from iconservice.base.exception import DatabaseException
+from iconservice.base.exception import DatabaseException, IconScoreException 
 from tbears.libs.scoretest.score_test_case import ScoreTestCase
 from ..basic_irc2 import BasicIRC2
 
@@ -50,12 +50,38 @@ class TestSimple(ScoreTestCase):
                 # print(balance_3)
                 self.assertEqual(self.symbol, self.score.symbol())
 
-        # def test_transfer(self):
-        #         to = self.test_account3
-        #         value = 100
-        #         params = {
-        #         '_to': to, 
-        #         '_value': value
-        #         }
-        #         self.score.transfer('_to': to, 
-        #         '_value': value)
+        def test_transfer(self):
+                owner = self.test_account1
+                to = self.test_account3
+                value = 100
+                #check balance
+                inibalance_owner = self.score.balanceOf(owner)
+                inibalance_receiver = self.score.balanceOf(to)
+                print(f' Ini {inibalance_owner} // {inibalance_receiver}')
+                # print(resu)
+                self.set_msg(owner,value)
+                self.score.transfer(to, value)
+                #check the result
+                fibalance_owner = self.score.balanceOf(owner)
+                fibalance_receiver = self.score.balanceOf(to)
+                print(f'Fin {fibalance_owner} // {fibalance_receiver}')
+                self.assertEqual(fibalance_owner, inibalance_owner-value)
+                self.assertEqual(fibalance_receiver, value)
+        
+        def test_negative_transfer(self):
+                owner = self.test_account1
+                to = self.test_account3
+                value = -1
+                self.set_msg(owner)
+                with self.assertRaises(IconScoreException) as cm:
+                        self.score.transfer(to, value) 
+                self.assertEqual(cm.exception.message, 'Transferring value cannot be less than zero' )
+        
+        def test_out_of_balance(self):
+                owner = self.test_account3
+                to = self.test_account4
+                value = 100
+                self.set_msg(owner)
+                with self.assertRaises(IconScoreException) as cm:
+                        self.score.transfer(to, value) 
+                self.assertEqual(cm.exception.message, 'Out of balance' )
